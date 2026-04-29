@@ -1,0 +1,20 @@
+FROM debian:bookworm
+
+RUN apt-get update && apt-get upgrade && su root
+
+RUN apt install nginx -y && apt install systemctl -y
+
+COPY . .
+
+RUN mkdir -p /etc/nginx/certs && \
+	openssl req -x509 -nodes -days 365 \
+	-newkey rsa:2048 \
+	-keyout /etc/nginx/certs/server.key \
+	-out /etc/nginx/certs/server.crt \
+	-subj "/CN=localhost"
+
+EXPOSE 443
+
+#CMD ["yes"]
+
+CMD ["nginx", "-c", "/nginx.conf",  "-g", "daemon off;"]

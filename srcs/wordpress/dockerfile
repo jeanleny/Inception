@@ -1,0 +1,6 @@
+
+FROM debian:bookworm
+
+RUN apt-get update && apt-get upgrade
+
+CMD ["sh", "-c", "while true; do echo Holala ya Wordpress; sleep 1; done"]

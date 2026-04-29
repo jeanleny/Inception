@@ -1,0 +1,9 @@
+services :
+  nginx :
+    ports :
+      - "443:443"
+    build : ./nginx
+  mariadb :
+    build : ./mariadb
+  wordpress :
+    build : ./wordpress
