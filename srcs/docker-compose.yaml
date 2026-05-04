@@ -3,7 +3,28 @@ services :
     ports :
       - "443:443"
     build : ./nginx
+    depends_on:
+      - wordpress
+    volumes :
+      - wordpress_data:/var/www/html
+    networks :
+      - inception
+
   mariadb :
     build : ./mariadb
+    env_file: .env
+    volumes :
+      - mariadb_data:/var/lib/mysql
+    networks :
+      - inception
+
   wordpress :
     build : ./wordpress
+
+volumes :
+  wordpress_data:
+  mariadb_data:
+
+networks :
+  inception :
+    driver : bridge

@@ -1,6 +1,50 @@
-
 FROM debian:bookworm
 
-RUN apt-get update && apt-get upgrade
+# Install everything WordPress + PHP-FPM needs
+# php8.2-fpm        → the PHP-FPM process manager itself
+# php8.2-mysql      → lets PHP talk to MySQL/MariaDB databases
+# php8.2-curl       → WordPress uses curl to check for updates, call APIs
+# php8.2-gd         → image processing (thumbnails, uploads)
+# php8.2-mbstring   → handles multibyte characters (non-english text)
+# php8.2-xml        → XML parsing, needed by many WordPress plugins
+# php8.2-zip        → installing/updating plugins and themes
+# mariadb-client    → gives us mysqladmin for the "wait for db" check
+# curl              → needed to download WP-CLI
+RUN apt-get update && apt-get install -y \
+    php8.2-fpm \
+    php8.2-mysql \
+    php8.2-curl \
+    php8.2-gd \
+    php8.2-mbstring \
+    php8.2-xml \
+    php8.2-zip \
+    mariadb-client \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
-CMD ["sh", "-c", "while true; do echo Holala ya Wordpress; sleep 1; done"]
+# Download WP-CLI — the command line tool we use in entrypoint.sh
+# It's a single .phar file (a PHP executable archive)
+RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
+    # make it executable
+    && chmod +x wp-cli.phar \
+    # move it to a system path so we can call it as just "wp"
+    && mv wp-cli.phar /usr/local/bin/wp
+
+# Create the directory where WordPress files will live
+# -p means no error if it already exists
+RUN mkdir -p /var/www/html
+
+# Replace the default PHP-FPM pool config with ours
+# The default www.conf listens on a unix socket — we need TCP port 9000
+COPY www.conf /etc/php/8.2/fpm/pool.d/www.conf
+
+# Copy our setup script
+COPY entrypoint.sh /entrypoint.sh
+
+# Make the script executable
+RUN chmod +x /entrypoint.sh
+
+# Document that PHP-FPM listens on port 9000
+EXPOSE 9000
+
+ENTRYPOINT ["/entrypoint.sh"]

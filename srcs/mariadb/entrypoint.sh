@@ -5,13 +5,20 @@
 # Without this, the script keeps running even after an error
 set -e
 
+# Create the directory where MariaDB puts its socket file
+# It doesn't exist by default in the debian:bookworm image
+# -p means "create parent directories too, no error if already exists"
+mkdir -p /run/mysqld
+
+# Give ownership to the mysql user
+# MariaDB runs as mysql (not root) and needs to write here
+chown -R mysql:mysql /run/mysqld
+
 # Check if the database has already been initialized
 # MariaDB stores all its data in /var/lib/mysql
 # The "mysql" subfolder is the internal system database
 # It only exists after a first-time setup — so we use it as a flag
 if [ ! -d "/var/lib/mysql/mysql" ]; then
-
-    echo "First start — initializing database..."
 
     # mysql_install_db sets up the base system tables MariaDB needs to function
     # --user=mysql    → run as the mysql system user (not root) for security
@@ -23,7 +30,7 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
     # Bootstrap mode lets us run SQL commands before the server is fully started
     # We pipe our SQL commands directly into it with <<EOF ... EOF
     # This is a "heredoc" — everything between EOF markers is treated as input
-    mysqld --user=mysql --bootstrap << EOF
+    mysqld --user=mysql --bootstrap --bind-address=0.0.0.0 << EOF
 
 -- Use the built-in mysql database to manage users and permissions
 USE mysql;
