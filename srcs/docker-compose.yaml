@@ -3,10 +3,10 @@ services :
     ports :
       - "443:443"
     build : ./nginx
+    volumes:
+    - wordpress_data:/var/www/html
     depends_on:
       - wordpress
-    volumes :
-      - wordpress_data:/var/www/html
     networks :
       - inception
 
@@ -20,6 +20,11 @@ services :
 
   wordpress :
     build : ./wordpress
+    env_file: .env
+    volumes :
+      - wordpress_data:/var/www/html
+    networks : 
+      - inception
 
 volumes :
   wordpress_data:

@@ -4,7 +4,9 @@ RUN apt-get update && apt-get upgrade && su root
 
 RUN apt install nginx -y && apt install systemctl -y
 
-COPY . .
+#COPY . .
+
+COPY nginx.conf /etc/nginx/nginx.conf
 
 RUN mkdir -p /etc/nginx/certs && \
 	openssl req -x509 -nodes -days 365 \
@@ -17,4 +19,4 @@ EXPOSE 443
 
 #CMD ["yes"]
 
-CMD ["nginx", "-c", "/nginx.conf",  "-g", "daemon off;"]
+CMD ["nginx", "-g", "daemon off;"]
