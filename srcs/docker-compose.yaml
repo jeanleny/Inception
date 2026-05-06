@@ -2,7 +2,10 @@ services :
   nginx :
     ports :
       - "443:443"
+      - "80:80"
     build : ./nginx
+    image : nginx:1.0
+    container_name : nginx
     volumes:
     - wordpress_data:/var/www/html
     depends_on:
@@ -12,6 +15,8 @@ services :
 
   mariadb :
     build : ./mariadb
+    image : mariadb:1.0
+    container_name : mariadb
     env_file: .env
     volumes :
       - mariadb_data:/var/lib/mysql
@@ -20,6 +25,8 @@ services :
 
   wordpress :
     build : ./wordpress
+    image : wordpress:1.0
+    container_name : wordpress
     env_file: .env
     volumes :
       - wordpress_data:/var/www/html
@@ -28,7 +35,17 @@ services :
 
 volumes :
   wordpress_data:
+    driver : local
+    driver_opts :
+      type : none
+      device : /home/lperis/data/wordpress
+      o : bind
   mariadb_data:
+    driver : local
+    driver_opts :
+      type : none
+      o : bind
+      device : /home/lperis/data/mariadb
 
 networks :
   inception :

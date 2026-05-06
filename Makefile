@@ -1,14 +1,15 @@
 include srcs/.env
 
-all: up
-
-up :
-	mkdir -p /home/lperis/data/wp/webfiles
-	mkdir -p /home/lperis/data/wp/db
-	docker compose -f ./srcs/docker-compose.yaml up
+all :
+	mkdir -p /home/lperis/data/mariadb
+	mkdir -p /home/lperis/data/wordpress
+	docker compose -f ./srcs/docker-compose.yaml up -d --build
 down :
 	docker compose -f ./srcs/docker-compose.yaml down -v
 
 clean : down
-	rm -rf /home/lperis/data/wp/webfiles
-	rm -rf /home/lperis/data/wp/db
+	sudo rm -rf /home/lperis/data/wordpress
+	sudo rm -rf /home/lperis/data/mariadb
+
+fclean : clean
+	docker system prune --all --force
