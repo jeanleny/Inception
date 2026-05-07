@@ -4,7 +4,8 @@ set -e
 WP_PATH=/var/www/html
 
 echo "Waiting for MariaDB..."
-until mysqladmin ping -h mariadb -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" --silent 2>/dev/null; do
+#until mysqladmin ping -h mariadb -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" --silent 2>/dev/null; do
+until nc -z mariadb 3306; do
     echo "  not ready yet, retrying in 2s..."
     sleep 2
 done
@@ -49,4 +50,5 @@ if [ ! -f "$WP_PATH/wp-config.php" ]; then
 fi
 
 echo "Starting PHP-FPM..."
-exec php-fpm8.2 -F
+exec "$@"
+#exec php-fpm8.2 -F
