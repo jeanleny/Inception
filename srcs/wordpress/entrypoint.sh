@@ -3,20 +3,18 @@ set -e
 
 WP_PATH=/var/www/html
 
-echo "Waiting for MariaDB..."
-#until mysqladmin ping -h mariadb -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" --silent 2>/dev/null; do
+echo "waiting db"
 until nc -z mariadb 3306; do
-    echo "  not ready yet, retrying in 2s..."
+    echo "waiting db"
     sleep 2
 done
-echo "MariaDB is ready."
+echo "db ready"
 
 if [ ! -f "$WP_PATH/wp-config.php" ]; then
 
-    echo "Downloading WordPress core files..."
     wp core download --path=$WP_PATH --allow-root
 
-    echo "Creating wp-config.php..."
+    echo "config"
     wp config create \
         --path=$WP_PATH \
         --dbname=$MYSQL_DATABASE \
@@ -25,7 +23,7 @@ if [ ! -f "$WP_PATH/wp-config.php" ]; then
         --dbhost=mariadb:3306 \
         --allow-root
 
-    echo "Installing WordPress..."
+    echo "wordpress install + admin"
     wp core install \
         --path=$WP_PATH \
         --url=$DOMAIN_NAME \
@@ -36,19 +34,17 @@ if [ ! -f "$WP_PATH/wp-config.php" ]; then
         --skip-email \
         --allow-root
 
-    echo "Creating second WordPress user..."
+    echo "create wp user"
     wp user create $WP_USER $WP_USER_EMAIL \
         --user_pass=$WP_USER_PASSWORD \
         --role=author \
         --path=$WP_PATH \
         --allow-root
 
-    echo "Fixing file permissions..."
     chown -R www-data:www-data $WP_PATH
 
-    echo "WordPress is ready."
+    echo "wp done"
 fi
 
-echo "Starting PHP-FPM..."
+echo "start php"
 exec "$@"
-#exec php-fpm8.2 -F

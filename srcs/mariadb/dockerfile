@@ -5,14 +5,10 @@ RUN apt-get update && apt-get upgrade && apt install -y mariadb-server
 
 COPY entrypoint.sh /entrypoint.sh
 
-# Make it executable so the OS can actually run it
 RUN chmod +x /entrypoint.sh
 
-# Document that this container listens on port 3306
-# (this doesn't actually open the port, it's just metadata)
 EXPOSE 3306
 
-# When the container starts, run our script
 ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["mysqld", "--user=mysql", "--bind-address=0.0.0.0"]

@@ -23,29 +23,18 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Download WP-CLI — the command line tool we use in entrypoint.sh
-# It's a single .phar file (a PHP executable archive)
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
-    # make it executable
     && chmod +x wp-cli.phar \
-    # move it to a system path so we can call it as just "wp"
     && mv wp-cli.phar /usr/local/bin/wp
 
-# Create the directory where WordPress files will live
-# -p means no error if it already exists
 RUN mkdir -p /var/www/html
 
-# Replace the default PHP-FPM pool config with ours
-# The default www.conf listens on a unix socket — we need TCP port 9000
 COPY www.conf /etc/php/8.2/fpm/pool.d/www.conf
 
-# Copy our setup script
 COPY entrypoint.sh /entrypoint.sh
 
-# Make the script executable
 RUN chmod +x /entrypoint.sh
 
-# Document that PHP-FPM listens on port 9000
 EXPOSE 9000
 
 ENTRYPOINT ["/entrypoint.sh"]
