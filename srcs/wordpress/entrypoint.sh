@@ -4,7 +4,7 @@ set -e
 WP_PATH=/var/www/html
 
 echo "waiting db"
-until nc -z mariadb 3306; do
+until nc -z mariadb $MYSQL_PORT; do
     echo "waiting db"
     sleep 2
 done
@@ -20,7 +20,7 @@ if [ ! -f "$WP_PATH/wp-config.php" ]; then
         --dbname=$MYSQL_DATABASE \
         --dbuser=$MYSQL_USER \
         --dbpass=$MYSQL_PASSWORD \
-        --dbhost=mariadb:3306 \
+        --dbhost=mariadb:$MYSQL_PORT \
         --allow-root
 
     echo "wordpress install + admin"

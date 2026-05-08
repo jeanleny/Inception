@@ -7,7 +7,7 @@ chown -R mysql:mysql /run/mysqld
 echo "mariadb start"
 
 if [ ! -d "/var/lib/mysql/$MYSQL_DATABASE" ]; then
-	mysqld --user=mysql --skip-networking &
+	mysqld --user=mysql --skip-networking --port=$MYSQL_PORT &
 	MYSQL_PID=$!
 	until mysqladmin ping --socket=/run/mysqld/mysqld.sock --silent 2>/dev/null; do
 	    echo "mariadb waiting"
