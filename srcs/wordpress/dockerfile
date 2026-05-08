@@ -1,10 +1,5 @@
 FROM debian:bookworm
 
-# Install everything WordPress + PHP-FPM needs
-# php8.2-fpm        → the PHP-FPM process manager itself
-# php8.2-mysql      → lets PHP talk to MySQL/MariaDB databases
-# php8.2-curl       → WordPress uses curl to check for updates, call APIs
-# curl              → needed to download WP-CLI
 RUN apt-get update && apt-get install -y \
     php8.2-fpm \
     php8.2-mysql \
