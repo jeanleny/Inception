@@ -14,6 +14,6 @@ clean	: down
 fclean	: clean
 	docker system prune --all --force
 
-re	: clean all
+re	: fclean all
 
 .PHONY : all down clean fclean re
